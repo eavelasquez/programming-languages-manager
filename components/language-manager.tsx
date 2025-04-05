@@ -20,6 +20,7 @@ export default function LanguageManager() {
   const [name, setName] = useState("")
   const [extension, setExtension] = useState("")
   const [error, setError] = useState("")
+  const [editingId, setEditingId] = useState<number | null>(null)
 
   // Load languages from localStorage on component mount
   useEffect(() => {
@@ -53,7 +54,7 @@ export default function LanguageManager() {
     }
   }, [languages])
 
-  const handleAddLanguage = () => {
+  const handleAddOrUpdateLanguage = () => {
     // Validate inputs
     if (!name.trim()) {
       setError("Language name is required")
@@ -65,15 +66,24 @@ export default function LanguageManager() {
       return
     }
 
-    // Add new language
-    const newLanguage = {
-      id: nextId,
-      name: name.trim(),
-      extension: extension.trim(),
+    if (editingId !== null) {
+      // Update existing language
+      setLanguages(
+        languages.map((lang) =>
+          lang.id === editingId ? { ...lang, name: name.trim(), extension: extension.trim() } : lang,
+        ),
+      )
+      setEditingId(null)
+    } else {
+      // Add new language
+      const newLanguage = {
+        id: nextId,
+        name: name.trim(),
+        extension: extension.trim(),
+      }
+      setLanguages([...languages, newLanguage])
+      setNextId(nextId + 1)
     }
-
-    setLanguages([...languages, newLanguage])
-    setNextId(nextId + 1)
 
     // Clear form
     setName("")
@@ -85,10 +95,21 @@ export default function LanguageManager() {
     setLanguages(languages.filter((lang) => lang.id !== id))
   }
 
+  const handleEditLanguage = (id: number) => {
+    const languageToEdit = languages.find((lang) => lang.id === id)
+    if (languageToEdit) {
+      setName(languageToEdit.name)
+      setExtension(languageToEdit.extension)
+      setEditingId(id)
+      setError("")
+    }
+  }
+
   const handleClear = () => {
     setName("")
     setExtension("")
     setError("")
+    setEditingId(null)
   }
 
   return (
@@ -115,10 +136,15 @@ export default function LanguageManager() {
                   <TableCell>{language.name}</TableCell>
                   <TableCell>{language.extension}</TableCell>
                   <TableCell>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteLanguage(language.id)}>
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Delete
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button variant="outline" size="sm" onClick={() => handleEditLanguage(language.id)}>
+                        Edit
+                      </Button>
+                      <Button variant="destructive" size="sm" onClick={() => handleDeleteLanguage(language.id)}>
+                        <Trash2 className="h-4 w-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
@@ -130,7 +156,7 @@ export default function LanguageManager() {
       {/* Add/Edit Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Add/Edit Language</CardTitle>
+          <CardTitle>{editingId !== null ? "Edit Language" : "Add Language"}</CardTitle>
           <p className="text-sm text-gray-500">Enter the details below to add a new language or edit an existing one</p>
         </CardHeader>
         <CardContent>
@@ -185,11 +211,10 @@ export default function LanguageManager() {
             <Button variant="outline" onClick={handleClear}>
               Clear
             </Button>
-            <Button onClick={handleAddLanguage}>Save</Button>
+            <Button onClick={handleAddOrUpdateLanguage}>{editingId !== null ? "Update" : "Save"}</Button>
           </div>
         </CardContent>
       </Card>
     </div>
   )
 }
-
