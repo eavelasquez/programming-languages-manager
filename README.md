@@ -2,7 +2,7 @@
 
 A modern web application built with Next.js and React that allows users to manage programming languages for a contest system. This application replicates the functionality shown in the provided interface, allowing users to add, view, and delete programming languages with persistent storage.
 
-![Programming Languages Manager Screenshot](<img width="1210" alt="image" src="https://github.com/user-attachments/assets/1afd1f66-28d7-4e40-8c58-2d5407ecc322" />)
+![Programming Languages Manager Screenshot](https://github.com/user-attachments/assets/1afd1f66-28d7-4e40-8c58-2d5407ecc322)
 
 ## Features
 
